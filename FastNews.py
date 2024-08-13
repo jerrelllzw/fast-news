@@ -2,7 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 
 topics = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
+seen_news_file = 'seen_news.txt'
 
+# Scrape
 def get_eatbook_food_news():
     try:
         response = requests.get('https://eatbook.sg/category/news/')
@@ -23,14 +25,41 @@ def get_eatbook_food_news():
 
     return titles
 
-def parse_food_news(food_news):
-    parsed_food_news = set()
-    for news in food_news:
+def parse_news(newsList):
+    parsed_news = set()
+    for news in newsList:
         if any(topic in news for topic in topics):
-            parsed_food_news.add(news)
-    return list(parsed_food_news)
+            parsed_news.add(news)
+    return list(parsed_news)
+
+# File I/O
+def load_seen_news(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            return set(line.strip() for line in f)
+    except FileNotFoundError:
+        return set()
+
+def save_seen_news(file_path, newsList):
+    with open(file_path, 'a') as f:
+        for news in newsList:
+            f.write(news + '\n')
 
 # Main
-food_news = get_eatbook_food_news()
-parsed_food_news = parse_food_news(food_news)
-print(parsed_food_news)
+def main():
+    seen_news = load_seen_news(seen_news_file)
+    food_news = parse_news(get_eatbook_food_news())
+
+    # Find new news
+    new_news = [news for news in food_news if news not in seen_news]
+
+    if new_news:
+        print("New food news:")
+        print("\n".join(new_news))
+        # Update the seen titles file
+        save_seen_news(seen_news_file, new_news)
+    else:
+        print("No new food news found.")
+
+if __name__ == "__main__":
+    main()
