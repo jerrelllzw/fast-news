@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
+# Constants
 topics = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
 seen_news_file = 'seen_news.txt'
 
