@@ -6,7 +6,7 @@ import logging
 TOPICS = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
 SEEN_NEWS_FILE = 'seen_news.txt'
 
-# Configure logging
+# Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Scrape
@@ -50,14 +50,12 @@ def main():
     seen_news = load_seen_news(SEEN_NEWS_FILE)
     food_news = parse_news(get_eatbook_food_news())
 
-    # Find new news
     new_news = [news for news in food_news if news not in seen_news]
 
     if new_news:
         logging.info("New food news:")
         for news in new_news:
             logging.info(news)
-        # Update the seen titles file
         save_seen_news(SEEN_NEWS_FILE, new_news)
     else:
         logging.info("No new food news found.")
