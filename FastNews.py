@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+topics = {"McDonald's", 'KFC', 'Popeyes', 'Burger King'}
+
 def get_eatbook_food_news():
     try:
         response = requests.get('https://eatbook.sg/category/news/')
@@ -21,7 +23,14 @@ def get_eatbook_food_news():
 
     return titles
 
+def parse_food_news(food_news):
+    parsed_food_news = set()
+    for news in food_news:
+        if any(topic in news for topic in topics):
+            parsed_food_news.add(news)
+    return list(parsed_food_news)
+
 # Main
 food_news = get_eatbook_food_news()
-for item in food_news:
-    print(item)
+parsed_food_news = parse_food_news(food_news)
+print(parsed_food_news)
