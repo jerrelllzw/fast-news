@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-topics = {"McDonald's", 'KFC', 'Popeyes', 'Burger King'}
+topics = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
 
 def get_eatbook_food_news():
     try:
