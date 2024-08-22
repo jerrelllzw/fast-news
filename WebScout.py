@@ -1,17 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
+import os
+from dotenv import load_dotenv
 
-# Constants
-TOPICS = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
-TELEGRAM_TOKEN = ''
-CHAT_ID = ''
+# Configuration
+load_dotenv()
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # In-Memory Storage
-seen_news = set()
+seen = set()
+
+# Topics
+TOPICS = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King', 'Cold Break'}
 
 # Scrape
 def get_eatbook_food_news():
@@ -47,12 +52,12 @@ def send_telegram_message(message):
 # Main function
 def main():
     food_news = parse_news(get_eatbook_food_news())
-    new_news = [news for news in food_news if news not in seen_news]
+    unseen = [news for news in food_news if news not in seen]
 
-    if new_news:
-        message = "New food news:\n" + "\n".join(new_news)
+    if unseen:
+        message = "New food news:\n" + "\n".join(unseen)
         send_telegram_message(message)
-        seen_news.update(new_news)
+        seen.update(unseen)
 
 if __name__ == "__main__":
     main()
