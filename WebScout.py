@@ -8,7 +8,7 @@ from telegram.ext import Application, CommandHandler, CallbackContext, MessageHa
 # Constants
 TOPICS = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
 SEEN_NEWS_FILE = 'seen_news.txt'
-TELEGRAM_TOKEN = 'your-telegram-bot-token'
+TELEGRAM_TOKEN = ''
 
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
