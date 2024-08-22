@@ -4,12 +4,14 @@ from scraper import get_eatbook_food_news
 from config import TELEGRAM_TOKEN, CHAT_ID
 
 # In-Memory Storage
-seen = set()
+fast_food_seen = set()
+uniqlo_seen = set()
+property_seen = set()
 
 # Topics
 FAST_FOOD = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King', 'Cold Break'}
-# instagram ut colleection
-# property prices
+UNIQLO = {"Uniqlo", "GU"}
+PROPERTY = {"property", "HDB", "condo"}
 
 def send_telegram_message(message):
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
@@ -21,13 +23,14 @@ def send_telegram_message(message):
         logging.error(f"An error occurred while sending the Telegram message: {e}")
 
 def fetch_and_notify():
-    food_news = parse_news(get_eatbook_food_news(), FAST_FOOD)
-    unseen = [news for news in food_news if news not in seen]
+    # Fast Food
+    fast_food_data = parse_data(get_eatbook_food_news(), FAST_FOOD)
+    fast_food_unseen = [news for news in fast_food_data if news not in fast_food_seen]
 
-    if unseen:
-        message = "New food news:\n" + "\n".join(unseen)
+    if fast_food_unseen:
+        message = "New food news:\n" + "\n".join(fast_food_unseen)
         send_telegram_message(message)
-        seen.update(unseen)
+        fast_food_seen.update(fast_food_unseen)
 
-def parse_news(news_list, test):
+def parse_data(news_list, test):
     return [news for news in set(news_list) if any(topic in news for topic in test)]
