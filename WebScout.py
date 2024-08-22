@@ -7,14 +7,14 @@ from telegram.ext import Application, CommandHandler, CallbackContext, MessageHa
 
 # Constants
 TOPICS = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
-SEEN_NEWS_FILE = 'seen_news.txt'
-TELEGRAM_TOKEN = ''
+TELEGRAM_TOKEN = ''  # Your Telegram bot token
 
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Store user chat IDs
-user_chat_ids = set()
+# In-Memory Storage
+user_chat_ids = set()  # Stores chat IDs of subscribed users
+seen_news = set()  # Stores the news that has already been seen/sent
 
 # Scrape
 def get_eatbook_food_news():
@@ -26,8 +26,6 @@ def get_eatbook_food_news():
         return []
 
     soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Extract titles from post headers
     titles = []
     for post_header in soup.find_all('div', class_='post-header'):
         for h2_tag in post_header.find_all('h2'):
@@ -38,22 +36,6 @@ def get_eatbook_food_news():
 
 def parse_news(news_list):
     return [news for news in set(news_list) if any(topic in news for topic in TOPICS)]
-
-# File I/O
-def load_seen_news(file_path):
-    try:
-        with open(file_path, 'r') as f:
-            return set(line.strip() for line in f)
-    except FileNotFoundError:
-        return set()
-
-def save_seen_news(file_path, news_list):
-    try:
-        with open(file_path, 'a') as f:
-            for news in news_list:
-                f.write(news + '\n')
-    except IOError as e:
-        logging.error(f"An error occurred while writing to the file: {e}")
 
 # Send Telegram message to all users
 async def send_telegram_message(application: Application, message: str):
@@ -77,7 +59,6 @@ async def handle_message(update: Update, context: CallbackContext):
 
 # Main
 async def main():
-    global user_chat_ids
     application = Application.builder().token(TELEGRAM_TOKEN).build()
 
     # Handlers
@@ -85,16 +66,13 @@ async def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Load seen news and start updates loop
-    seen_news = load_seen_news(SEEN_NEWS_FILE)
     food_news = parse_news(get_eatbook_food_news())
     new_news = [news for news in food_news if news not in seen_news]
 
     if new_news:
         message = "New food news:\n" + "\n".join(new_news)
         await send_telegram_message(application, message)
-        save_seen_news(SEEN_NEWS_FILE, new_news)
-    else:
-        await send_telegram_message(application, "No new food news found.")
+        seen_news.update(new_news)  # Update the seen news with the new ones
 
     # Run the bot
     await application.run_polling()
