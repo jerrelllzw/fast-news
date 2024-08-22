@@ -1,21 +1,10 @@
-import logging
-from scraper import get_eatbook_food_news, parse_news
-from utils import send_telegram_message
-
-# Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-# In-Memory Storage
-seen = set()
+import time
+from utils import fetch_and_notify
 
 def main():
-    food_news = parse_news(get_eatbook_food_news())
-    unseen = [news for news in food_news if news not in seen]
-
-    if unseen:
-        message = "New food news:\n" + "\n".join(unseen)
-        send_telegram_message(message)
-        seen.update(unseen)
+    while True:
+        fetch_and_notify()
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()

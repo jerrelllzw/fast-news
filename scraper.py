@@ -4,7 +4,8 @@ import logging
 
 # Topics
 FAST_FOOD = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King', 'Cold Break'}
-
+# instagram ut colleection
+# property prices
 def get_eatbook_food_news():
     try:
         response = requests.get('https://eatbook.sg/category/news/')
