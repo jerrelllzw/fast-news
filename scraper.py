@@ -2,10 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 
-# Topics
-FAST_FOOD = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King', 'Cold Break'}
-# instagram ut colleection
-# property prices
 def get_eatbook_food_news():
     try:
         response = requests.get('https://eatbook.sg/category/news/')
@@ -22,6 +18,3 @@ def get_eatbook_food_news():
                 titles.append(a_tag.get_text(strip=True))
 
     return titles
-
-def parse_news(news_list):
-    return [news for news in set(news_list) if any(topic in news for topic in FAST_FOOD)]
