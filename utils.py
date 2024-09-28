@@ -1,17 +1,19 @@
 import logging
 import requests
-from scraper import get_eatbook_food_news
+from scraper import get_eatbook_food_news, get_uniqlo_new_arrivals
 from config import TELEGRAM_TOKEN, CHAT_ID
 
 # In-Memory Storage
 fast_food_seen = set()
 uniqlo_seen = set()
 property_seen = set()
+bto_seen = set()
 
 # Topics
-FAST_FOOD = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King', 'Cold Break'}
-UNIQLO = {"Uniqlo", "GU"}
-PROPERTY = {"property", "HDB", "condo"}
+FAST_FOOD = {"McDonald’s", 'KFC', 'Popeyes', 'Burger King'}
+UNIQLO = {}
+PROPERTY = {}
+BTO = {}
 
 def send_telegram_message(message):
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
@@ -31,6 +33,15 @@ def fetch_and_notify():
         message = "New food news:\n" + "\n".join(fast_food_unseen)
         send_telegram_message(message)
         fast_food_seen.update(fast_food_unseen)
+
+    # Uniqlo
+    uniqlo_data = get_uniqlo_new_arrivals()
+    uniqlo_unseen = [news for news in uniqlo_data if news not in uniqlo_seen]
+
+    if uniqlo_unseen:
+        message = "New uniqlo news:\n" + "\n".join(uniqlo_unseen)
+        send_telegram_message(message)
+        uniqlo_seen.update(uniqlo_unseen)
 
 def parse_data(news_list, test):
     return [news for news in set(news_list) if any(topic in news for topic in test)]
