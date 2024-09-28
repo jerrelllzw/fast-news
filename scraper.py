@@ -2,6 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 def get_eatbook_food_news():
     try:
@@ -54,11 +58,16 @@ def get_bto_releases():
     # Scrape using webdriver
     driver = webdriver.Chrome()
     driver.get('https://homes.hdb.gov.sg/home/finding-a-flat')
+    upcoming_bto_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'flat-link')]//div[contains(@class, 'tag-bto') and contains(text(), 'Upcoming BTO')]"))
+    )
+    upcoming_bto_button.click()
+    time.sleep(3)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     driver.quit()
 
-    results = []
-    for release in soup.find_all('div', class_='bto-release'):
-        results.append(release.get_text(strip=True))
-    print(results)
+    results = set()
+    for release in soup.find_all('h2', class_='h6'):
+        results.add(release.get_text(strip=True))
+
     return results
