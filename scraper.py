@@ -40,18 +40,17 @@ def get_uniqlo_new_arrivals():
     return results
 
 def get_property_guru_listings():
-    try:
-        response = requests.get('https://www.propertyguru.com.sg/property-for-sale')
-        response.raise_for_status()
-    except requests.RequestException as e:
-        logging.error(f"An error occurred while fetching the URL: {e}")
-        return []
+    # Scrape using webdriver
+    driver = webdriver.Chrome()
+    driver.get('https://www.propertyguru.com.sg/property-for-rent?market=residential&district_code[]=D01&district_code[]=D02&district_code[]=D06&district_code[]=D07&district_code[]=D15&freetext=D01+Boat+Quay+/+Raffles+Place+/+Marina,+D02+Chinatown+/+Tanjong+Pagar,+D06+City+Hall+/+Clarke+Quay,+D07+Beach+Road+/+Bugis+/+Rochor,+D15+East+Coast+/+Marine+Parade&beds[]=3&beds[]=4&beds[]=5&listing_type=rent&maxprice=4500&search=true')
+    time.sleep(3)
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    driver.quit()
 
-    soup = BeautifulSoup(response.text, 'html.parser')
     results = []
-    for listing in soup.find_all('div', class_='listing-card'):
-        results.append(listing.get_text(strip=True))
-
+    for listing in soup.find_all('a', class_='nav-link', itemprop='url'):
+        results.append(listing['href'])
+    
     return results
 
 def get_bto_releases():
