@@ -2,13 +2,8 @@ import os
 import logging
 import requests
 from scraper import get_eatbook_food_news, get_uniqlo_new_arrivals, get_property_guru_listings, get_bto_releases
-from config import TELEGRAM_TOKEN, CHAT_ID
+from config import TELEGRAM_TOKEN, CHAT_ID, FAST_FOOD_SEEN_FILE, UNIQLO_SEEN_FILE, PROPERTY_SEEN_FILE
 from typing import List, Set
-
-# File paths for seen data
-FAST_FOOD_SEEN_FILE = "fast_food_seen.txt"
-UNIQLO_SEEN_FILE = "uniqlo_seen.txt"
-PROPERTY_SEEN_FILE = "property_seen.txt"
 
 # Helper Functions for File Operations
 def read_seen_file(file_path: str) -> Set[str]:
