@@ -26,11 +26,12 @@ def filter_and_notify(data: List[str], seen: Set[str], title: str, emoji: str) -
     unseen_data = [item for item in data if item not in seen]
     
     if unseen_data:
-        message = f"{emoji} {title} {emoji}\n" + "\n".join(unseen_data)
+        message = f"{emoji}{title}{emoji}\n" + "\n".join([f"• {item}" for item in unseen_data])
         send_telegram_message(message)
         seen.update(unseen_data)
     else:
         logging.info(f"No new {title.lower()} updates to notify.")
+
 
 def fetch_and_notify_fast_food() -> None:
     """Fetches fast food news and sends a notification for unseen items."""
@@ -53,7 +54,7 @@ def fetch_and_notify_bto() -> None:
     bto_data = get_bto_releases()
     
     if bto_data:
-        message = "🏢 BTO Releases 🏢\n" + "\n".join(bto_data)
+        message = "🏢BTO Releases🏢\n" + "\n".join([f"• {release}" for release in bto_data])
         send_telegram_message(message)
     else:
         logging.info("No new BTO releases to notify.")
