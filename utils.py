@@ -35,7 +35,7 @@ def filter_and_notify(data: List[str], seen: Set[str], title: str, emoji: str) -
 
 def fetch_and_notify_fast_food() -> None:
     """Fetches fast food news and sends a notification for unseen items."""
-    topics = {"McDonald’s", "KFC", "Popeyes", "Burger King", "Abundance"}
+    topics = {"McDonald’s", "KFC", "Popeyes", "Burger King"}
     fast_food_data = [news for news in set(get_eatbook_food_news()) if any(topic in news for topic in topics)]
     filter_and_notify(fast_food_data, fast_food_seen, "Fast Food News", "🍔")
 
