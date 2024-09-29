@@ -1,7 +1,7 @@
-# FastNews
+# WebScout
 
-A Telegram bot to keep you updated on fast food news in Singapore.
+A Python-based web scraper that scrapes websites of interest.
 
 ## Description
 
-Scrapes the web for fast food news and alerts you whenever there are new items. It currently only tracks these restaurants: McDonald's, KFC, Popeyes and Burger King. Check out @fastnews8_bot on Telegram!
+Scrapes the web for updates and sends them in a Telegram message. It currently retrieves fast food news, Uniqlo new arrivals, property listings, and BTO releases.
