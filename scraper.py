@@ -13,13 +13,7 @@ from typing import List, Set
 # Constants for URLs
 EATBOOK_NEWS_URL = 'https://eatbook.sg/category/news/'
 UNIQLO_NEW_ARRIVALS_URL = 'https://www.uniqlo.com/sg/en/special-feature/ut/collection-lineup'
-PROPERTY_GURU_URL = ('https://www.propertyguru.com.sg/property-for-rent?market=residential'
-                     '&district_code[]=D01&district_code[]=D02&district_code[]=D06'
-                     '&district_code[]=D07&district_code[]=D15'
-                     '&freetext=D01+Boat+Quay+/+Raffles+Place+/+Marina,'
-                     'D02+Chinatown+/+Tanjong+Pagar,D06+City+Hall+/+Clarke+Quay,'
-                     'D07+Beach+Road+/+Bugis+/+Rochor,D15+East+Coast+/+Marine+Parade'
-                     '&beds[]=3&beds[]=4&beds[]=5&listing_type=rent&maxprice=4500&search=true')
+PROPERTY_GURU_URL = 'https://www.propertyguru.com.sg/property-for-rent?market=residential&freetext=Pinnacle+@+Duxton&listing_type=rent&maxprice=6000&property_id=20538&search=true'
 HDB_BTO_URL = 'https://homes.hdb.gov.sg/home/finding-a-flat'
 
 
