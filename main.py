@@ -1,3 +1,4 @@
+import time
 from utils import fetch_and_notify_fast_food, fetch_and_notify_uniqlo, fetch_and_notify_property, fetch_and_notify_bto
 
 def main():
@@ -5,7 +6,9 @@ def main():
     fetch_and_notify_fast_food()
     fetch_and_notify_uniqlo()
     fetch_and_notify_property()
-    fetch_and_notify_bto()
+    # fetch_and_notify_bto()
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+        time.sleep(300)
