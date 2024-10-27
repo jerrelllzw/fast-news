@@ -1,76 +1,52 @@
-import os
 import logging
 import requests
 from scraper import get_eatbook_food_news, get_uniqlo_new_arrivals, get_property_guru_listings, get_bto_releases
-from config import TELEGRAM_TOKEN, CHAT_ID, FAST_FOOD_SEEN_FILE, UNIQLO_SEEN_FILE, PROPERTY_SEEN_FILE
+from config import TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, BEN_CHAT_ID
 from typing import List, Set
 
-# Helper Functions for File Operations
-def read_seen_file(file_path: str) -> Set[str]:
-    """Reads seen data from the specified file."""
-    if not os.path.exists(file_path):
-        return set()
-    
-    with open(file_path, 'r') as file:
-        return set(line.strip() for line in file)
-
-def write_seen_file(file_path: str, new_items: List[str]) -> None:
-    """Writes new seen items to the specified file."""
-    with open(file_path, 'a') as file:
-        for item in new_items:
-            file.write(f"{item}\n")
-
 # Telegram Message Sender
-def send_telegram_message(message: str) -> None:
-    """Sends a message to a specific Telegram chat."""
+def send_telegram_message(message: str, chat_id: str) -> bool:
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
-    data = {'chat_id': CHAT_ID, 'text': message}
+    data = {'chat_id': chat_id, 'text': message}
     try:
         response = requests.post(url, data=data)
         response.raise_for_status()
         logging.info(f"Message sent: {message}")
+        return True
     except requests.RequestException as e:
         logging.error(f"An error occurred while sending the Telegram message: {e}")
+        return False
+
+# Seen Trackers
+fast_food_seen = set()
+uniqlo_seen = set()
+property_seen = set()
+bto_seen = set()
 
 # Notification Helper
-def filter_and_notify(data: List[str], file_path: str, title: str, emoji: str) -> None:
-    """Filters new items from file-stored seen data and sends notification if there are any unseen."""
-    seen_data = read_seen_file(file_path)
-    unseen_data = [item for item in data if item not in seen_data]
-    
+def filter_and_notify(data: List[str], title: str, emoji: str, chat_id: str, tracker: Set[str]) -> None:
+    unseen_data = [item for item in data if item not in tracker]
     if unseen_data:
-        message = f"{emoji} {title} {emoji}\n\n" + "\n".join([f"⚡ {item}" for item in unseen_data])
-        send_telegram_message(message)
-        write_seen_file(file_path, unseen_data)
+        message = f"{emoji} {title} {emoji}\n\n" + "\n".join([f"⚡ {item} \n" for item in unseen_data])
+        if send_telegram_message(message, chat_id):
+            tracker.update(unseen_data)
     else:
         logging.info(f"No new {title.lower()} updates to notify.")
 
-# Fast Food Notification
+# Fetch and Notify Functions
 def fetch_and_notify_fast_food() -> None:
-    """Fetches fast food news and sends a notification for unseen items."""
     topics = {"McDonald’s", "KFC", "Popeyes", "Burger King"}
     fast_food_data = [news for news in set(get_eatbook_food_news()) if any(topic in news for topic in topics)]
-    filter_and_notify(fast_food_data, FAST_FOOD_SEEN_FILE, "Fast Food News", "🍔")
+    filter_and_notify(fast_food_data, "Fast Food News", "🍔", TELEGRAM_CHAT_ID, fast_food_seen)
 
-# Uniqlo Notification
 def fetch_and_notify_uniqlo() -> None:
-    """Fetches Uniqlo new arrivals and sends a notification for unseen items."""
     uniqlo_data = get_uniqlo_new_arrivals()
-    filter_and_notify(uniqlo_data, UNIQLO_SEEN_FILE, "Uniqlo New Arrivals", "👕")
+    filter_and_notify(uniqlo_data, "Uniqlo New Arrivals", "👕", TELEGRAM_CHAT_ID, uniqlo_seen)
 
-# Property Notification
 def fetch_and_notify_property() -> None:
-    """Fetches property listings and sends a notification for unseen items."""
     property_data = get_property_guru_listings()
-    filter_and_notify(property_data, PROPERTY_SEEN_FILE, "Property Listings", "🏠")
+    filter_and_notify(property_data, "Property Listings", "🏠", BEN_CHAT_ID, property_seen)
 
-# BTO Notification
 def fetch_and_notify_bto() -> None:
-    """Fetches BTO releases and sends a notification."""
     bto_data = get_bto_releases()
-
-    if bto_data:
-        message = "🏢 BTO Releases 🏢\n\n" + "\n".join([f"⚡ {release}" for release in bto_data])
-        send_telegram_message(message)
-    else:
-        logging.info("No new BTO releases to notify.")
+    filter_and_notify(bto_data, "BTO Releases", "🏢", TELEGRAM_CHAT_ID, bto_seen)

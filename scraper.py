@@ -13,18 +13,11 @@ from typing import List, Set
 # Constants for URLs
 EATBOOK_NEWS_URL = 'https://eatbook.sg/category/news/'
 UNIQLO_NEW_ARRIVALS_URL = 'https://www.uniqlo.com/sg/en/special-feature/ut/collection-lineup'
-PROPERTY_GURU_URL = ('https://www.propertyguru.com.sg/property-for-rent?market=residential'
-                     '&district_code[]=D01&district_code[]=D02&district_code[]=D06'
-                     '&district_code[]=D07&district_code[]=D15'
-                     '&freetext=D01+Boat+Quay+/+Raffles+Place+/+Marina,'
-                     'D02+Chinatown+/+Tanjong+Pagar,D06+City+Hall+/+Clarke+Quay,'
-                     'D07+Beach+Road+/+Bugis+/+Rochor,D15+East+Coast+/+Marine+Parade'
-                     '&beds[]=3&beds[]=4&beds[]=5&listing_type=rent&maxprice=4500&search=true')
+PROPERTY_GURU_URL = 'https://www.propertyguru.com.sg/property-for-rent?market=residential&property_id=20538&freetext=Pinnacle+@+Duxton&listing_type=rent&maxprice=5000&beds[]=3&beds[]=5&beds[]=4&search=true'
 HDB_BTO_URL = 'https://homes.hdb.gov.sg/home/finding-a-flat'
 
-
+# Helper Functions
 def get_soup_from_url(url: str) -> BeautifulSoup:
-    """ Fetches content from a URL and returns a BeautifulSoup object. """
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -33,18 +26,15 @@ def get_soup_from_url(url: str) -> BeautifulSoup:
         return BeautifulSoup("", 'html.parser')
     return BeautifulSoup(response.text, 'html.parser')
 
-
 def get_soup_from_webdriver(url: str, wait_time: int = 3) -> BeautifulSoup:
-    """ Fetches page source using Selenium WebDriver and returns a BeautifulSoup object. """
     with webdriver.Chrome(service=Service(ChromeDriverManager().install())) as driver:
         driver.get(url)
         time.sleep(wait_time)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
     return soup
 
-
+# Scraper Functions
 def get_eatbook_food_news() -> List[str]:
-    """ Scrapes Eatbook's food news and returns a list of titles. """
     soup = get_soup_from_url(EATBOOK_NEWS_URL)
     results = [
         a_tag.get_text(strip=True)
@@ -54,9 +44,7 @@ def get_eatbook_food_news() -> List[str]:
     ]
     return results
 
-
 def get_uniqlo_new_arrivals() -> List[str]:
-    """ Scrapes Uniqlo's new arrivals page using Selenium and returns a list of item titles. """
     soup = get_soup_from_webdriver(UNIQLO_NEW_ARRIVALS_URL)
     new_arrivals_section = soup.select_one('div#lineup_new_arrivals div.lineup_list')
     if not new_arrivals_section:
@@ -68,18 +56,14 @@ def get_uniqlo_new_arrivals() -> List[str]:
     ]
     return results
 
-
 def get_property_guru_listings() -> List[str]:
-    """ Scrapes PropertyGuru's listings and returns a list of listing URLs. """
     soup = get_soup_from_webdriver(PROPERTY_GURU_URL)
     results = [
         listing['href'] for listing in soup.find_all('a', class_='nav-link', itemprop='url')
     ]
     return results
 
-
 def get_bto_releases() -> Set[str]:
-    """ Scrapes HDB's site for upcoming BTO releases. """
     with webdriver.Chrome(service=Service(ChromeDriverManager().install())) as driver:
         driver.get(HDB_BTO_URL)
         try:
