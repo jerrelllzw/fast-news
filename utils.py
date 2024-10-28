@@ -45,7 +45,7 @@ def fetch_and_notify_uniqlo() -> None:
 
 def fetch_and_notify_property() -> None:
     property_data = get_property_guru_listings()
-    filter_and_notify(property_data, "Property Listings", "🏠", BEN_CHAT_ID, property_seen)
+    filter_and_notify(property_data, "Property Listings", "🏠", TELEGRAM_CHAT_ID, property_seen)
 
 def fetch_and_notify_bto() -> None:
     bto_data = get_bto_releases()
