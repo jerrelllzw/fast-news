@@ -6,7 +6,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 from typing import List, Set
@@ -27,12 +26,9 @@ def get_soup_from_url(url: str) -> BeautifulSoup:
         return BeautifulSoup("", 'html.parser')
     return BeautifulSoup(response.text, 'html.parser')
 
-def get_soup_from_webdriver(url: str, wait_time: int = 1) -> BeautifulSoup:
-    options = Options()
-    options.add_argument("--headless")
-    with webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options) as driver:
+def get_soup_from_webdriver(url: str) -> BeautifulSoup:
+    with webdriver.Chrome(service=Service(ChromeDriverManager().install())) as driver:
         driver.get(url)
-        time.sleep(wait_time)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
     return soup
 
